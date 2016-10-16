@@ -44,13 +44,17 @@ public class Lab4 {
 				
 		// setup the odometer and display
 		Odometer odo = new Odometer(leftMotor, rightMotor, 30, true);
-		LCDInfo lcd = new LCDInfo(odo);
+		
 		
 		Navigation nav = new Navigation(odo);
+		
+		
 		
 		// perform the ultrasonic localization
 		USLocalizer usl = new USLocalizer(odo, nav, usValue, usData, USLocalizer.LocalizationType.FALLING_EDGE);
 		usl.doLocalization();
+		
+		LCDInfo lcd = new LCDInfo(odo, usl);
 		
 		// perform the light sensor localization
 //		LightLocalizer lsl = new LightLocalizer(odo, colorValue, colorData);

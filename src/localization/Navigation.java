@@ -13,7 +13,7 @@ package localization;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigation {
-	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
+	final static int FAST = 200, SLOW = 100, ACCELERATION = 200;
 	final static double DEG_ERR = 3.0, CM_ERR = 1.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
@@ -120,8 +120,27 @@ public class Navigation {
 	
 	//method to turn by a set angle
 	public void turnBy(double angle){
+		leftMotor.setSpeed(150);
+		rightMotor.setSpeed(150);
 		leftMotor.rotate(convertAngle(this.odometer.getLeftRadius(), this.odometer.getWidth(), angle), true);
 		rightMotor.rotate(-convertAngle(this.odometer.getLeftRadius(), this.odometer.getWidth(), angle), false);
+	}
+	
+	public void turnTo1(double angle, boolean stop) {
+
+		double error = angle - this.odometer.getAng();
+
+		while (Math.abs(error) > DEG_ERR) {
+
+			error = angle - this.odometer.getAng();
+			
+			this.setSpeeds(-SLOW, SLOW);
+			
+		}
+
+		if (stop) {
+			this.setSpeeds(0, 0);
+		}
 	}
 	
 	/*

@@ -1,8 +1,9 @@
 package localization;
 
+import lejos.hardware.Sound;
 import lejos.robotics.SampleProvider;
 
-public class USLocalizer {
+public class USLocalizer implements UltrasonicController {
 	public enum LocalizationType { FALLING_EDGE, RISING_EDGE };
 	public static double ROTATION_SPEED = 30;
 
@@ -13,6 +14,7 @@ public class USLocalizer {
 	private LocalizationType locType;
 	private final int d = 40;
 	private final int k = 5;
+	private int wallDistance;
 	
 	public USLocalizer(Odometer odo, Navigation nav, SampleProvider usSensor, float[] usData, LocalizationType locType) {
 		this.odo = odo;
@@ -27,7 +29,15 @@ public class USLocalizer {
 		double angleA, angleB;
 		
 		if (locType == LocalizationType.FALLING_EDGE) {
-			nav.turnBy(360);
+			//nav.turnTo1(360, true);
+			
+			nav.turnTo1(odo.getAng() - 4, true);
+			
+			if (this.readUSDistance()>100){
+				Sound.buzz();
+			}
+			
+			nav.stopMotors();
 			
 			
 			
@@ -63,6 +73,18 @@ public class USLocalizer {
 		float distance = usData[0];
 				
 		return distance;
+	}
+
+	@Override
+	public void processUSData(int distance) {
+		 this.wallDistance = distance;
+		
+	}
+
+	@Override
+	public int readUSDistance() {
+		// TODO Auto-generated method stub
+		return wallDistance;
 	}
 
 }
