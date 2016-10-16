@@ -71,8 +71,7 @@ public class Navigation {
 
 	//method to stop the motors
 	public void stopMotors(){
-		this.leftMotor.stop();
-		this.rightMotor.stop();
+		this.setSpeeds(0,0);
 	}
 	/*
 	 * TravelTo function which takes as arguments the x and y position in cm Will travel to designated position, while
@@ -126,11 +125,11 @@ public class Navigation {
 		rightMotor.rotate(-convertAngle(this.odometer.getLeftRadius(), this.odometer.getWidth(), angle), false);
 	}
 	
-	public void turnTo1(double angle, boolean stop) {
+	public void turnTo1(double angle, boolean stop, int distance) {
 
 		double error = angle - this.odometer.getAng();
 
-		while (Math.abs(error) > DEG_ERR) {
+		while (Math.abs(error) > DEG_ERR ) {
 
 			error = angle - this.odometer.getAng();
 			
