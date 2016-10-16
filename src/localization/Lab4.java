@@ -38,9 +38,9 @@ public class Lab4 {
 		// 3. Create a sample provider instance for the above and initialize operating mode
 		// 4. Create a buffer for the sensor data
 		
-//		SensorModes colorSensor = new EV3ColorSensor(colorPort);
-//		SampleProvider colorValue = colorSensor.getMode("Red");			// colorValue provides samples from this instance
-//		float[] colorData = new float[colorValue.sampleSize()];			// colorData is the buffer in which data are returned
+		SensorModes colorSensor = new EV3ColorSensor(colorPort);
+		SampleProvider colorValue = colorSensor.getMode("Red");			// colorValue provides samples from this instance
+		float[] colorData = new float[colorValue.sampleSize()];			// colorData is the buffer in which data are returned
 				
 		// setup the odometer and display
 		Odometer odo = new Odometer(leftMotor, rightMotor, 30, true);
@@ -59,8 +59,8 @@ public class Lab4 {
 		
 		
 		// perform the light sensor localization
-//		LightLocalizer lsl = new LightLocalizer(odo, colorValue, colorData);
-//		lsl.doLocalization();			
+		LightLocalizer lsl = new LightLocalizer(odo, nav, colorValue, colorData, rightMotor, leftMotor);
+		lsl.doLocalization();			
 		
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);	
