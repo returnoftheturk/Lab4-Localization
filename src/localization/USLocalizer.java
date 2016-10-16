@@ -7,12 +7,16 @@ public class USLocalizer {
 	public static double ROTATION_SPEED = 30;
 
 	private Odometer odo;
+	private Navigation nav;
 	private SampleProvider usSensor;
 	private float[] usData;
 	private LocalizationType locType;
+	private final int d = 40;
+	private final int k = 5;
 	
-	public USLocalizer(Odometer odo,  SampleProvider usSensor, float[] usData, LocalizationType locType) {
+	public USLocalizer(Odometer odo, Navigation nav, SampleProvider usSensor, float[] usData, LocalizationType locType) {
 		this.odo = odo;
+		this.nav = nav;
 		this.usSensor = usSensor;
 		this.usData = usData;
 		this.locType = locType;
@@ -23,6 +27,10 @@ public class USLocalizer {
 		double angleA, angleB;
 		
 		if (locType == LocalizationType.FALLING_EDGE) {
+			nav.turnBy(360);
+			
+			
+			
 			// rotate the robot until it sees no wall
 			
 			// keep rotating until the robot sees a wall, then latch the angle
