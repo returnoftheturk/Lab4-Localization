@@ -18,11 +18,11 @@ public class LightLocalizer {
 	private float[] colorData;
 	private static double colorLevel;
 	
+	// set variables
 	private boolean inPosition = false;
 	private final double black = 0.2;
 	private double wheelRadius;
 	private final double sensorDistance = 13.0;
-	
 	private double[] angles;
 	private int angleIndex;
 	
@@ -50,13 +50,15 @@ public class LightLocalizer {
 		colorSensor.fetchSample(colorData, 0);
 		colorLevel = colorData[0];
 		
+		
+		System.out.println("%n%n%n%n%n" + colorLevel);
 		// assume the robot is not in right position to measure data for the lab
 		// drive to location listed in tutorial
 		while (this.inPosition == false) {
 			getToRightPosition(colorLevel);
 		}
 
-		// start rotating  360 degrees and read all 4 lines
+		// rotate(counter clockwise) 360 degrees and read all 4 lines
 		leftMotor.setSpeed(SLOW);
 		rightMotor.setSpeed(SLOW);
 		leftMotor.backward();
@@ -71,8 +73,9 @@ public class LightLocalizer {
 		}
 
 		// do trig to compute (0,0) and 0 degrees
-		double thetaX = angles[2] - angles[0];
-		double thetaY = angles[3] - angles[1];
+		double thetaX = angles[2] - angles[0]; // angle sensed by y axis line
+		double thetaY = angles[3] - angles[1]; // angle sensed by x axis line
+		// compute x and y
 		double x = (-1) * sensorDistance * Math.cos(Math.PI * thetaY / (2 * 180));
 		double y = (-1) * sensorDistance * Math.cos(Math.PI * thetaX / (2 * 180));
 		double thetaYNeg = angles[0];
@@ -97,7 +100,7 @@ public class LightLocalizer {
 		if (colorLevel < black) {
 			Sound.beep();
 			leftMotor.stop(true);
-			rightMotor.stop(true);
+			rightMotor.stop(false);
 		}
 
 		// back up a bit
@@ -114,7 +117,7 @@ public class LightLocalizer {
 		if (colorLevel < black) {
 			Sound.beep();
 			leftMotor.stop(true);
-			rightMotor.stop(true);
+			rightMotor.stop(false);
 		}
 
 		// back up a bit
@@ -136,10 +139,9 @@ public class LightLocalizer {
 		return (int) ((180.0 * distance) / (Math.PI * radius));
 	}
 
-	// return color reading in string
-	public static String getColor() {
-		String colorString = String.valueOf(colorLevel);
-		return colorString;
+	// return color data
+	public static double getColor() {
+		return colorLevel;
 	}
 
 }
