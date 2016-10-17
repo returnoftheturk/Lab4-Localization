@@ -10,46 +10,47 @@ import lejos.robotics.SampleProvider;
 
 public class LightLocalizer {
 
-	final static int FAST = 100, SLOW = 50, DISTANCE = 15;
+	final int FAST = 100, SLOW = 50, DISTANCE = 16;
 
 	private Odometer odo;
 	private Navigation nav;
 	private SampleProvider colorSensor;
 	private float[] colorData;
 	private static double colorLevel;
+	
 	private boolean inPosition = false;
-
 	private final double black = 0.2;
 	private double wheelRadius;
-
+	private final double sensorDistance = 13.0;
+	
 	private double[] angles;
 	private int angleIndex;
 	
-	private final double sensorDistance = 13.0;
-
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 
-	public LightLocalizer(Odometer odo, Navigation nav, SampleProvider colorSensor, float[] colorData,
-			EV3LargeRegulatedMotor rightMotor, EV3LargeRegulatedMotor leftMotor) {
+	public LightLocalizer(Odometer odo, Navigation nav, SampleProvider colorSensor, float[] colorData) {
 		this.odo = odo;
 		this.nav = nav;
 		this.colorSensor = colorSensor;
-		this.colorData = colorData;
-		this.leftMotor = leftMotor;
-		this.rightMotor = rightMotor;
-		this.wheelRadius = 2.1;
+		this.colorData = colorData;	
+		// get the motors
+		EV3LargeRegulatedMotor[] motors = odo.getMotors();
+		this.leftMotor = motors[0];		
+		this.rightMotor = motors[1];
+		this.wheelRadius = odo.getLeftRadius();
 		// initialize arrays
 		angles = new double[4];
 		angleIndex = 0;
-		this.leftMotor.setAcceleration(nav.ACCELERATION);
-		this.rightMotor.setAcceleration(nav.ACCELERATION);
+		this.leftMotor.setAcceleration(Navigation.ACCELERATION);
+		this.rightMotor.setAcceleration(Navigation.ACCELERATION);
 	}
 
 	public void doLocalization() {
 		// get color data and store in colorLevel
 		colorSensor.fetchSample(colorData, 0);
 		colorLevel = colorData[0];
-
+		
+		// assume the robot is not in right position to measure data for the lab
 		// drive to location listed in tutorial
 		while (this.inPosition == false) {
 			getToRightPosition(colorLevel);

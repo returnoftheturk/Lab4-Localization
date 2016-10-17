@@ -4,7 +4,7 @@ import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.SampleProvider;
 
-public class USLocalizer implements UltrasonicController {
+public class USLocalizer {
 	public enum LocalizationType { FALLING_EDGE, RISING_EDGE };
 	public static int ROTATION_SPEED = 30;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
@@ -97,24 +97,12 @@ public class USLocalizer implements UltrasonicController {
 				
 		return distance;
 	}
-
-	@Override
-	public void processUSData(int distance) {
-		 this.wallDistance = distance;
-		
-	}
-
-	@Override
-	public int readUSDistance() {
-		// TODO Auto-generated method stub
-		return wallDistance;
-	}
 	
 	public void turnTo1(double angle, boolean stop, int distance) {
 
 		double error = angle - this.odo.getAng();
 
-		while (Math.abs(error) > nav.DEG_ERR && readUSDistance()>distance) {
+		while (Math.abs(error) > nav.DEG_ERR && getFilteredData()>distance) {
 
 			error = angle - this.odo.getAng();
 			
