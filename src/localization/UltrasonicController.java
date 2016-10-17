@@ -7,6 +7,4 @@ public interface UltrasonicController {
 	
 	public int readUSDistance();
 
-//	public double robotToFinish();
-//	public double blockToFinish();
 }
