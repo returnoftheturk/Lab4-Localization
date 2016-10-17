@@ -23,15 +23,12 @@ public class LightLocalizer {
 	private double wheelRadius;
 
 	private double[] angles;
-	private double[] odoAngles;
 	private int angleIndex;
 	
 	private final double sensorDistance = 13.0;
 
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 
-	// public LightLocalizer(Odometer odo, Navigation nav,
-	// EV3LargeRegulatedMotor rightMotor, EV3LargeRegulatedMotor leftMotor) {
 	public LightLocalizer(Odometer odo, Navigation nav, SampleProvider colorSensor, float[] colorData,
 			EV3LargeRegulatedMotor rightMotor, EV3LargeRegulatedMotor leftMotor) {
 		this.odo = odo;
@@ -43,7 +40,6 @@ public class LightLocalizer {
 		this.wheelRadius = 2.1;
 		// initialize arrays
 		angles = new double[4];
-		odoAngles = new double[4];
 		angleIndex = 0;
 		this.leftMotor.setAcceleration(nav.ACCELERATION);
 		this.rightMotor.setAcceleration(nav.ACCELERATION);
@@ -53,13 +49,13 @@ public class LightLocalizer {
 		// get color data and store in colorLevel
 		colorSensor.fetchSample(colorData, 0);
 		colorLevel = colorData[0];
-		System.out.println(colorLevel);
+
 		// drive to location listed in tutorial
-		while (inPosition == false) {
+		while (this.inPosition == false) {
 			getToRightPosition(colorLevel);
 		}
 
-		// start rotating and clock all 4 gridlines
+		// start rotating  360 degrees and read all 4 lines
 		leftMotor.setSpeed(SLOW);
 		rightMotor.setSpeed(SLOW);
 		leftMotor.backward();
@@ -89,6 +85,7 @@ public class LightLocalizer {
 
 	}
 
+	// drive the robot to a position where it can read 4 lines
 	public boolean getToRightPosition(double colorLevel) {
 		// go forward until the robot reach a black line
 		nav.setSpeeds(SLOW, SLOW);
@@ -96,17 +93,11 @@ public class LightLocalizer {
 		rightMotor.forward();
 
 		// reached black line, stop motors
-		while (colorLevel < black) {
+		if (colorLevel < black) {
 			Sound.beep();
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			leftMotor.stop(true);
+			rightMotor.stop(true);
 		}
-		leftMotor.stop(true);
-		rightMotor.stop(true);
 
 		// back up a bit
 		leftMotor.rotate(-convertDistance(wheelRadius, DISTANCE), true);
@@ -119,23 +110,20 @@ public class LightLocalizer {
 		rightMotor.forward();
 
 		// reached black line, stop motors
-		while (colorLevel < black) {
+		if (colorLevel < black) {
 			Sound.beep();
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			leftMotor.stop(true);
+			rightMotor.stop(true);
 		}
-		leftMotor.stop(true);
-		rightMotor.stop(true);
 
 		// back up a bit
 		leftMotor.rotate(-convertDistance(wheelRadius, DISTANCE), true);
 		rightMotor.rotate(-convertDistance(wheelRadius, DISTANCE), false);
 
-		return true;
+		// in the right position, set boolean to true
+		this.inPosition = true;
+		
+		return inPosition;
 
 	}
 
@@ -149,7 +137,8 @@ public class LightLocalizer {
 
 	// return color reading in string
 	public static String getColor() {
-		return Double.toString(colorLevel);
+		String colorString = String.valueOf(colorLevel);
+		return colorString;
 	}
 
 }

@@ -48,10 +48,10 @@ public class Lab4 {
 		
 
 //		// perform the ultrasonic localization
-//		USLocalizer usl = new USLocalizer(odo, nav, usValue, usData, USLocalizer.LocalizationType.FALLING_EDGE, rightMotor, leftMotor);
-//		UltrasonicPoller usPoller = new UltrasonicPoller(usValue, usData, usl);
-//		LCDInfo lcd = new LCDInfo(odo, usl);
-//		usPoller.start();
+		USLocalizer usl = new USLocalizer(odo, nav, usValue, usData, USLocalizer.LocalizationType.FALLING_EDGE, rightMotor, leftMotor);
+		UltrasonicPoller usPoller = new UltrasonicPoller(usValue, usData, usl);
+		LCDInfo lcd = new LCDInfo(odo, usl);
+		usPoller.start();
 //		usl.doLocalization();
 		
 
