@@ -16,7 +16,7 @@ public class USLocalizer implements UltrasonicController {
 	private float[] usData;
 	private LocalizationType locType;
 	private final int d = 40;
-	private final int k = 5;
+	private final int k = 10;
 	private int wallDistance;
 	private final int TOLERANCE = 10;
 	
@@ -36,31 +36,51 @@ public class USLocalizer implements UltrasonicController {
 	
 	public void doLocalization() {
 		double [] pos = new double [3];
-		double angleA, angleB;
+		double angleA, angleA1, angleA2, angleB, angleB1, angleB2;
 		
 		if (locType == LocalizationType.FALLING_EDGE) {
 
+			//start rotating towards the left (positive angle)
+			//while distance < 50
 			while (getFilteredData()<d+k){
 				nav.setSpeeds(ROTATION_SPEED, -ROTATION_SPEED);
 			}
+			Sound.buzz();
 			nav.stopMotors();
+			angleA1 = this.odo.getAng();
 			
-			while(getFilteredData()>d-k - TOLERANCE){
+			//keep rotating until robot is under the falling edge
+			//while distance > 30
+			while(getFilteredData()>d-k){ // - tolerance
 				nav.setSpeeds(ROTATION_SPEED, -ROTATION_SPEED);
 				
 			}
+			Sound.buzz();
 			nav.stopMotors();
-			angleA = this.odo.getAng();
+			angleB1 = this.odo.getAng();
+			
+			//while distance < 40
+			//rotate back the other way
 			while(getFilteredData()<d+k){
 				nav.setSpeeds(-ROTATION_SPEED, ROTATION_SPEED);	
 			}
+			Sound.buzz();
 			nav.stopMotors();
+			angleB2 = odo.getAng();
+			
+			//while distance>30
 			while(getFilteredData()>d-k){
 				nav.setSpeeds(-ROTATION_SPEED, ROTATION_SPEED);
 			}
+			Sound.buzz();
 			nav.stopMotors();
-			angleB = this.odo.getAng();
-						
+			angleA2 = this.odo.getAng();
+			
+			angleB = (angleB1+angleB2)/2;
+			angleA = (angleA1+angleA2)/2;
+			
+			nav.turnBy((angleB-angleA)/2 - 45);
+						//add angleA1 - angleA2 to turnby?
 			
 			// rotate the robot until it sees no wall
 			
