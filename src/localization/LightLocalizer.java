@@ -15,9 +15,9 @@ public class LightLocalizer {
 
 	private Odometer odo;
 	private Navigation nav;
-	private SampleProvider colorValue;
+	private SampleProvider colorSensor;
 	private float[] colorData;
-	private static double colorLevel;
+	// private static double colorLevel;
 
 	// set variables
 	private boolean inPosition;
@@ -32,7 +32,7 @@ public class LightLocalizer {
 	public LightLocalizer(Odometer odo, Navigation nav, SampleProvider colorValue, float[] colorData) {
 		this.odo = odo;
 		this.nav = nav;
-		this.colorValue = colorValue;	
+		this.colorSensor = colorValue;
 		this.colorData = colorData;
 		// get the motors
 		EV3LargeRegulatedMotor[] motors = odo.getMotors();
@@ -44,20 +44,19 @@ public class LightLocalizer {
 		angleIndex = 0;
 		this.leftMotor.setAcceleration(200);
 		this.rightMotor.setAcceleration(200);
-		
+
 	}
 
 	public void doLocalization() {
-		// get color data and store in colorLevel
-		colorValue.fetchSample(colorData, 0);
-		colorLevel = colorData[0];
-		
+
+		// colorLevel = getColorData();
+
 		System.out.println();
 		System.out.println();
 		System.out.println();
 		System.out.println();
-		System.out.println(colorLevel);
-		// assume the robot is not in the right position to measure data for
+		System.out.println(getColorData());
+		// assume the robot is not at the right position to measure data for
 		// the lab
 		// drive to location listed in tutorial
 		inPosition = false;
@@ -77,7 +76,7 @@ public class LightLocalizer {
 
 			while (angleIndex < 4) {
 				// for every black line, beep & record data
-				if (colorLevel < black) {
+				if (getColorData() < black) {
 					Sound.beepSequenceUp();
 					angles[angleIndex] = odo.getAng();
 					angleIndex++;
@@ -85,21 +84,20 @@ public class LightLocalizer {
 			}
 
 			// do trig to compute (0,0) and 0 degrees
-			double thetaX = angles[2] - angles[0]; // angle sensed by y axis
-													// line
-			double thetaY = angles[3] - angles[1]; // angle sensed by x axis
-													// line
+			double thetaX = angles[2] - angles[0]; // angle sensed at y axis
+			double thetaY = angles[3] - angles[1]; // angle sensed at x axis
+
 			// compute x and y
 			double x = (-1) * sensorDistance * Math.cos(Math.PI * thetaY / (2 * 180));
 			double y = (-1) * sensorDistance * Math.cos(Math.PI * thetaX / (2 * 180));
-			double thetaYNeg = angles[0];
+			// double thetaYNeg = angles[0];
 			// double deltaTheta = 270 + thetaY/2 - thetaYMinus;
 
 			// set position based on the computation
-			odo.setPosition(new double[] { x, y, 0 }, new boolean[] { true, true, true });
-			// when done travel to (0,0) and turn to 0 degrees
+			odo.setPosition(new double[] { x, y, 90 }, new boolean[] { true, true, true });
+			// when done travel to (0,0) and turn to 90 degrees (initial position)
 			nav.travelTo(0, 0);
-			nav.turnTo(0, true);
+			nav.turnTo(90, true);
 		}
 
 	}
@@ -112,7 +110,7 @@ public class LightLocalizer {
 		rightMotor.forward();
 
 		// reached black line, stop motors
-		if (colorLevel < black) {
+		if (getColorData() < black) {
 			Sound.beep();
 			leftMotor.stop(true);
 			rightMotor.stop(true);
@@ -122,14 +120,15 @@ public class LightLocalizer {
 		leftMotor.rotate(-convertDistance(wheelRadius, DISTANCE), true);
 		rightMotor.rotate(-convertDistance(wheelRadius, DISTANCE), false);
 
-		// turn 90 degrees (facing x axis), go forward to find another black line
+		// turn 90 degrees (facing x axis), go forward to find another black
+		// line
 		nav.turnTo(-90, true);
 		nav.setSpeeds(SLOW, SLOW);
 		leftMotor.forward();
 		rightMotor.forward();
 
 		// reached black line, stop motors
-		if (colorLevel < black) {
+		if (getColorData() < black) {
 			Sound.beep();
 			leftMotor.stop(true);
 			rightMotor.stop(true);
@@ -155,8 +154,9 @@ public class LightLocalizer {
 		return (int) ((180.0 * distance) / (Math.PI * radius));
 	}
 
-	// return color data
-	public static double getColor() {
+	private double getColorData() {
+		colorSensor.fetchSample(colorData, 0);
+		double colorLevel = colorData[0];
 		return colorLevel;
 	}
 
